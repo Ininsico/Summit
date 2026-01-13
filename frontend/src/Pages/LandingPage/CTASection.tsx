@@ -1,606 +1,258 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
+import { useState } from "react";
 
 const CTASection: React.FC = () => {
-    const sectionRef = useRef<HTMLDivElement>(null);
-    const formRef = useRef<HTMLDivElement>(null);
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        phone: '',
-        destination: '',
-        travelDate: '',
-        travelers: '1',
-        message: ''
-    });
-
-    const colors = {
-        white: '#ffffff',
-        background: '#0a0e27',
-        surface: '#141b3d',
-        primary: '#4A90E2',
-        primaryLight: '#6BA3E8',
-        secondary: '#2E5C8A',
-        accent: '#5BA3D0',
-        textPrimary: '#ffffff',
-        textSecondary: '#b8c5d6',
-        border: '#2d3e5f',
-    };
-
-    const fonts = {
-        title: "'Outfit', 'Inter', sans-serif",
-        body: "'Inter', sans-serif",
-    };
-
-    useEffect(() => {
-        const ctx = gsap.context(() => {
-            if (formRef.current) {
-                // Ensure it's visible by default, animate FROM hidden
-                gsap.set(formRef.current, { visibility: 'visible' });
-
-                gsap.from(formRef.current, {
-                    opacity: 0,
-                    y: 50,
-                    duration: 1,
-                    ease: 'power3.out',
-                    scrollTrigger: {
-                        trigger: formRef.current,
-                        start: 'top 85%',
-                        // Play when entering, reverse when leaving upwards, but stay visible otherwise
-                        toggleActions: 'play none none none',
-                    }
-                });
-            }
-        });
-
-        return () => ctx.revert();
-    }, []);
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
-    };
-
+    const [email, setEmail] = useState('');
+    
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Form submitted:', formData);
-        // Add your form submission logic here
-        alert('Thank you! We will contact you soon.');
+        
+        if (!email || !email.includes('@')) {
+            alert("Enter a valid email!");
+            return;
+        }
+        
+        alert(`Subscribed: ${email}`);
+        setEmail('');
     };
 
-    const destinations = [
-        'Nanga Parbat',
-        'Rakaposhi Base Camp',
-        'Shangrila Desert (Skardu)',
-        'Hunza Valley',
-        'Fairy Meadows',
-        'Kaghan Valley',
-        'Naran',
-        'Other'
-    ];
-
     return (
-        <section
-            ref={sectionRef}
-            id="contact"
-            style={{
-                position: 'relative',
-                padding: '120px 20px',
-                backgroundColor: colors.white,
-                overflow: 'hidden',
-            }}
-        >
-            {/* Background Pattern */}
-            <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundImage: `
-          linear-gradient(${colors.primary}10 1px, transparent 1px),
-          linear-gradient(90deg, ${colors.primary}10 1px, transparent 1px)
-        `,
-                backgroundSize: '50px 50px',
-                opacity: 0.3,
-                zIndex: 0
-            }} />
+        <section className="relative w-full min-h-screen bg-white overflow-hidden">
+            {/* Decorative Background Elements */}
+            <div className="absolute inset-0">
+                {/* Blue gradient corners */}
+                <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-blue-50 to-transparent"></div>
+                <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-blue-50 to-transparent"></div>
+                
+                {/* Grid lines */}
+                <div className="absolute inset-0" style={{
+                    backgroundImage: `
+                        linear-gradient(90deg, #e5e7eb 1px, transparent 1px),
+                        linear-gradient(180deg, #e5e7eb 1px, transparent 1px)
+                    `,
+                    backgroundSize: '50px 50px',
+                    opacity: 0.3
+                }}></div>
+            </div>
 
-            <div style={{
-                position: 'relative',
-                zIndex: 1,
-                maxWidth: '1200px',
-                width: '100%',
-                margin: '0 auto'
-            }}>
-                {/* Header */}
-                <div style={{
-                    textAlign: 'center',
-                    marginBottom: '60px',
-                }}>
-                    <div style={{
-                        display: 'inline-block',
-                        padding: '8px 24px',
-                        background: `${colors.primary}15`,
-                        borderRadius: '50px',
-                        border: `1px solid ${colors.primary}30`,
-                        marginBottom: '24px',
-                        fontSize: '0.9rem',
-                        fontWeight: '600',
-                        color: colors.primary,
-                        letterSpacing: '1px',
-                        textTransform: 'uppercase',
-                        fontFamily: fonts.body
-                    }}>
-                        Start Your Journey
+            {/* Main Content */}
+            <div className="relative z-10 w-full min-h-screen flex flex-col items-center justify-center px-4 py-12 md:py-20">
+                {/* Top Badge */}
+                <div className="mb-12 group cursor-pointer">
+                    <div className="relative">
+                        <div className="px-8 py-4 bg-blue-600 text-white rounded-full font-semibold text-sm tracking-widest uppercase 
+                                       group-hover:bg-white group-hover:text-blue-600 
+                                       transition-all duration-500 
+                                       border-2 border-blue-600
+                                       shadow-lg group-hover:shadow-xl">
+                            Subscribe Now
+                        </div>
+                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-600 rounded-full 
+                                       group-hover:bg-white group-hover:border-blue-600
+                                       border-2 border-white 
+                                       transition-all duration-500"></div>
                     </div>
-
-                    <h2 style={{
-                        fontSize: 'clamp(2.5rem, 5vw, 4rem)',
-                        fontWeight: '900',
-                        background: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        backgroundClip: 'text',
-                        lineHeight: '1.2',
-                        fontFamily: fonts.title,
-                        marginBottom: '24px'
-                    }}>
-                        Ready to Explore Pakistan?
-                    </h2>
-
-                    <p style={{
-                        fontSize: 'clamp(1.1rem, 2vw, 1.3rem)',
-                        color: '#4a5568',
-                        lineHeight: '1.8',
-                        maxWidth: '700px',
-                        margin: '0 auto',
-                        fontFamily: fonts.body,
-                    }}>
-                        Fill out the form below and our travel experts will contact you within 24 hours
-                        to plan your perfect adventure in Northern Pakistan.
-                    </p>
                 </div>
 
-                {/* Form Container */}
-                <div
-                    ref={formRef}
-                    style={{
-                        maxWidth: '800px',
-                        margin: '0 auto',
-                        background: `linear-gradient(135deg, ${colors.surface}f5, ${colors.background}f5)`,
-                        borderRadius: '32px',
-                        padding: '60px 50px',
-                        boxShadow: '0 30px 80px rgba(0, 0, 0, 0.15)',
-                        border: `1px solid ${colors.border}`,
-                        opacity: 1
-                    }}
+                {/* Main Heading */}
+                <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-center mb-6">
+                    <span className="text-gray-900 block">
+                        STAY
+                    </span>
+                    <span className="text-blue-600 block mt-2">
+                        CONNECTED
+                    </span>
+                </h1>
+
+                {/* Subheading */}
+                <p className="text-lg md:text-xl text-gray-600 text-center max-w-2xl mx-auto mb-12 leading-relaxed">
+                    Join <span className="font-bold text-blue-600">10,000+ professionals</span> who get weekly insights, 
+                    exclusive content, and tools you won't find anywhere else.
+                </p>
+
+                {/* Stats Cards */}
+                <div className="flex flex-wrap justify-center gap-6 mb-16">
+                    {[
+                        { value: "99%", label: "Open Rate", icon: "📈" },
+                        { value: "24h", label: "Delivery", icon: "⚡" },
+                        { value: "0%", label: "Spam", icon: "🚫" }
+                    ].map((stat, index) => (
+                        <div 
+                            key={index}
+                            className="group relative bg-white border-2 border-blue-200 rounded-2xl p-6 
+                                     hover:bg-blue-600 hover:text-white hover:border-blue-600
+                                     transition-all duration-500 cursor-pointer
+                                     shadow-lg hover:shadow-2xl hover:-translate-y-2"
+                        >
+                            <div className="text-2xl mb-2 group-hover:scale-110 transition-transform duration-500">
+                                {stat.icon}
+                            </div>
+                            <div className="text-3xl font-bold text-blue-600 group-hover:text-white mb-1 transition-colors duration-500">
+                                {stat.value}
+                            </div>
+                            <div className="text-sm text-gray-600 group-hover:text-white/80 font-medium transition-colors duration-500">
+                                {stat.label}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Email Form */}
+                <form 
+                    onSubmit={handleSubmit}
+                    className="w-full max-w-2xl bg-blue-600 rounded-3xl p-8 md:p-10 
+                             hover:bg-white hover:border-blue-600
+                             border-4 border-blue-600
+                             transition-all duration-500
+                             shadow-2xl hover:shadow-3xl group"
                 >
-                    <form onSubmit={handleSubmit}>
-                        {/* Name and Email Row */}
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-                            gap: '24px',
-                            marginBottom: '24px'
-                        }}>
-                            {/* Name */}
-                            <div>
-                                <label style={{
-                                    display: 'block',
-                                    fontSize: '0.95rem',
-                                    fontWeight: '600',
-                                    color: colors.textPrimary,
-                                    marginBottom: '8px',
-                                    fontFamily: fonts.body
-                                }}>
-                                    Full Name *
-                                </label>
-                                <input
-                                    type="text"
-                                    name="name"
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                    required
-                                    placeholder="Enter your name"
-                                    style={{
-                                        width: '100%',
-                                        padding: '14px 18px',
-                                        fontSize: '1rem',
-                                        borderRadius: '12px',
-                                        border: `2px solid ${colors.border}`,
-                                        backgroundColor: `${colors.surface}80`,
-                                        color: colors.textPrimary,
-                                        fontFamily: fonts.body,
-                                        transition: 'all 0.3s ease',
-                                        outline: 'none'
-                                    }}
-                                    onFocus={(e) => {
-                                        e.target.style.borderColor = colors.primary;
-                                        e.target.style.boxShadow = `0 0 0 4px ${colors.primary}20`;
-                                    }}
-                                    onBlur={(e) => {
-                                        e.target.style.borderColor = colors.border;
-                                        e.target.style.boxShadow = 'none';
-                                    }}
-                                />
-                            </div>
-
-                            {/* Email */}
-                            <div>
-                                <label style={{
-                                    display: 'block',
-                                    fontSize: '0.95rem',
-                                    fontWeight: '600',
-                                    color: colors.textPrimary,
-                                    marginBottom: '8px',
-                                    fontFamily: fonts.body
-                                }}>
-                                    Email Address *
-                                </label>
-                                <input
-                                    type="email"
-                                    name="email"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    required
-                                    placeholder="your@email.com"
-                                    style={{
-                                        width: '100%',
-                                        padding: '14px 18px',
-                                        fontSize: '1rem',
-                                        borderRadius: '12px',
-                                        border: `2px solid ${colors.border}`,
-                                        backgroundColor: `${colors.surface}80`,
-                                        color: colors.textPrimary,
-                                        fontFamily: fonts.body,
-                                        transition: 'all 0.3s ease',
-                                        outline: 'none'
-                                    }}
-                                    onFocus={(e) => {
-                                        e.target.style.borderColor = colors.primary;
-                                        e.target.style.boxShadow = `0 0 0 4px ${colors.primary}20`;
-                                    }}
-                                    onBlur={(e) => {
-                                        e.target.style.borderColor = colors.border;
-                                        e.target.style.boxShadow = 'none';
-                                    }}
-                                />
-                            </div>
-                        </div>
-
-                        {/* Phone and Destination Row */}
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-                            gap: '24px',
-                            marginBottom: '24px'
-                        }}>
-                            {/* Phone */}
-                            <div>
-                                <label style={{
-                                    display: 'block',
-                                    fontSize: '0.95rem',
-                                    fontWeight: '600',
-                                    color: colors.textPrimary,
-                                    marginBottom: '8px',
-                                    fontFamily: fonts.body
-                                }}>
-                                    Phone Number *
-                                </label>
-                                <input
-                                    type="tel"
-                                    name="phone"
-                                    value={formData.phone}
-                                    onChange={handleChange}
-                                    required
-                                    placeholder="+92 300 1234567"
-                                    style={{
-                                        width: '100%',
-                                        padding: '14px 18px',
-                                        fontSize: '1rem',
-                                        borderRadius: '12px',
-                                        border: `2px solid ${colors.border}`,
-                                        backgroundColor: `${colors.surface}80`,
-                                        color: colors.textPrimary,
-                                        fontFamily: fonts.body,
-                                        transition: 'all 0.3s ease',
-                                        outline: 'none'
-                                    }}
-                                    onFocus={(e) => {
-                                        e.target.style.borderColor = colors.primary;
-                                        e.target.style.boxShadow = `0 0 0 4px ${colors.primary}20`;
-                                    }}
-                                    onBlur={(e) => {
-                                        e.target.style.borderColor = colors.border;
-                                        e.target.style.boxShadow = 'none';
-                                    }}
-                                />
-                            </div>
-
-                            {/* Destination */}
-                            <div>
-                                <label style={{
-                                    display: 'block',
-                                    fontSize: '0.95rem',
-                                    fontWeight: '600',
-                                    color: colors.textPrimary,
-                                    marginBottom: '8px',
-                                    fontFamily: fonts.body
-                                }}>
-                                    Preferred Destination *
-                                </label>
-                                <select
-                                    name="destination"
-                                    value={formData.destination}
-                                    onChange={handleChange}
-                                    required
-                                    style={{
-                                        width: '100%',
-                                        padding: '14px 18px',
-                                        fontSize: '1rem',
-                                        borderRadius: '12px',
-                                        border: `2px solid ${colors.border}`,
-                                        backgroundColor: `${colors.surface}80`,
-                                        color: colors.textPrimary,
-                                        fontFamily: fonts.body,
-                                        transition: 'all 0.3s ease',
-                                        outline: 'none',
-                                        cursor: 'pointer'
-                                    }}
-                                    onFocus={(e) => {
-                                        e.target.style.borderColor = colors.primary;
-                                        e.target.style.boxShadow = `0 0 0 4px ${colors.primary}20`;
-                                    }}
-                                    onBlur={(e) => {
-                                        e.target.style.borderColor = colors.border;
-                                        e.target.style.boxShadow = 'none';
-                                    }}
-                                >
-                                    <option value="">Select destination</option>
-                                    {destinations.map((dest, idx) => (
-                                        <option key={idx} value={dest}>{dest}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-
-                        {/* Travel Date and Travelers Row */}
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-                            gap: '24px',
-                            marginBottom: '24px'
-                        }}>
-                            {/* Travel Date */}
-                            <div>
-                                <label style={{
-                                    display: 'block',
-                                    fontSize: '0.95rem',
-                                    fontWeight: '600',
-                                    color: colors.textPrimary,
-                                    marginBottom: '8px',
-                                    fontFamily: fonts.body
-                                }}>
-                                    Preferred Travel Date
-                                </label>
-                                <input
-                                    type="date"
-                                    name="travelDate"
-                                    value={formData.travelDate}
-                                    onChange={handleChange}
-                                    style={{
-                                        width: '100%',
-                                        padding: '14px 18px',
-                                        fontSize: '1rem',
-                                        borderRadius: '12px',
-                                        border: `2px solid ${colors.border}`,
-                                        backgroundColor: `${colors.surface}80`,
-                                        color: colors.textPrimary,
-                                        fontFamily: fonts.body,
-                                        transition: 'all 0.3s ease',
-                                        outline: 'none',
-                                        cursor: 'pointer'
-                                    }}
-                                    onFocus={(e) => {
-                                        e.target.style.borderColor = colors.primary;
-                                        e.target.style.boxShadow = `0 0 0 4px ${colors.primary}20`;
-                                    }}
-                                    onBlur={(e) => {
-                                        e.target.style.borderColor = colors.border;
-                                        e.target.style.boxShadow = 'none';
-                                    }}
-                                />
-                            </div>
-
-                            {/* Number of Travelers */}
-                            <div>
-                                <label style={{
-                                    display: 'block',
-                                    fontSize: '0.95rem',
-                                    fontWeight: '600',
-                                    color: colors.textPrimary,
-                                    marginBottom: '8px',
-                                    fontFamily: fonts.body
-                                }}>
-                                    Number of Travelers
-                                </label>
-                                <select
-                                    name="travelers"
-                                    value={formData.travelers}
-                                    onChange={handleChange}
-                                    style={{
-                                        width: '100%',
-                                        padding: '14px 18px',
-                                        fontSize: '1rem',
-                                        borderRadius: '12px',
-                                        border: `2px solid ${colors.border}`,
-                                        backgroundColor: `${colors.surface}80`,
-                                        color: colors.textPrimary,
-                                        fontFamily: fonts.body,
-                                        transition: 'all 0.3s ease',
-                                        outline: 'none',
-                                        cursor: 'pointer'
-                                    }}
-                                    onFocus={(e) => {
-                                        e.target.style.borderColor = colors.primary;
-                                        e.target.style.boxShadow = `0 0 0 4px ${colors.primary}20`;
-                                    }}
-                                    onBlur={(e) => {
-                                        e.target.style.borderColor = colors.border;
-                                        e.target.style.boxShadow = 'none';
-                                    }}
-                                >
-                                    {[1, 2, 3, 4, 5, 6, 7, 8, '9+'].map((num, idx) => (
-                                        <option key={idx} value={num}>{num} {num === 1 ? 'Person' : 'People'}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-
-                        {/* Message */}
-                        <div style={{ marginBottom: '32px' }}>
-                            <label style={{
-                                display: 'block',
-                                fontSize: '0.95rem',
-                                fontWeight: '600',
-                                color: colors.textPrimary,
-                                marginBottom: '8px',
-                                fontFamily: fonts.body
-                            }}>
-                                Additional Message (Optional)
-                            </label>
-                            <textarea
-                                name="message"
-                                value={formData.message}
-                                onChange={handleChange}
-                                rows={4}
-                                placeholder="Tell us about your travel preferences, budget, or any special requirements..."
-                                style={{
-                                    width: '100%',
-                                    padding: '14px 18px',
-                                    fontSize: '1rem',
-                                    borderRadius: '12px',
-                                    border: `2px solid ${colors.border}`,
-                                    backgroundColor: `${colors.surface}80`,
-                                    color: colors.textPrimary,
-                                    fontFamily: fonts.body,
-                                    transition: 'all 0.3s ease',
-                                    outline: 'none',
-                                    resize: 'vertical'
-                                }}
-                                onFocus={(e) => {
-                                    e.target.style.borderColor = colors.primary;
-                                    e.target.style.boxShadow = `0 0 0 4px ${colors.primary}20`;
-                                }}
-                                onBlur={(e) => {
-                                    e.target.style.borderColor = colors.border;
-                                    e.target.style.boxShadow = 'none';
-                                }}
+                    <div className="flex flex-col md:flex-row gap-4">
+                        {/* Email Input */}
+                        <div className="flex-grow relative">
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="your@email.com"
+                                required
+                                className="w-full px-6 py-5 text-lg bg-white text-gray-900 rounded-2xl 
+                                         border-2 border-blue-600 group-hover:border-blue-600
+                                         focus:outline-none focus:ring-4 focus:ring-blue-300
+                                         placeholder-gray-400
+                                         transition-all duration-500
+                                         shadow-inner"
                             />
+                            <div className="absolute right-5 top-1/2 transform -translate-y-1/2 
+                                         text-blue-600 group-hover:text-blue-600 transition-colors duration-500">
+                                ✉️
+                            </div>
                         </div>
-
+                        
                         {/* Submit Button */}
                         <button
                             type="submit"
-                            style={{
-                                width: '100%',
-                                padding: '18px 40px',
-                                background: `linear-gradient(135deg, ${colors.primary}, ${colors.accent})`,
-                                color: colors.textPrimary,
-                                border: 'none',
-                                borderRadius: '12px',
-                                fontSize: '1.2rem',
-                                fontWeight: '700',
-                                cursor: 'pointer',
-                                fontFamily: fonts.body,
-                                boxShadow: `0 10px 40px ${colors.primary}40`,
-                                transition: 'all 0.3s ease',
-                                textTransform: 'uppercase',
-                                letterSpacing: '1px'
-                            }}
-                            onMouseEnter={(e) => {
-                                gsap.to(e.currentTarget, {
-                                    y: -4,
-                                    scale: 1.02,
-                                    boxShadow: `0 15px 50px ${colors.primary}60`,
-                                    duration: 0.3
-                                });
-                            }}
-                            onMouseLeave={(e) => {
-                                gsap.to(e.currentTarget, {
-                                    y: 0,
-                                    scale: 1,
-                                    boxShadow: `0 10px 40px ${colors.primary}40`,
-                                    duration: 0.3
-                                });
-                            }}
+                            className="px-10 py-5 bg-white text-blue-600 font-bold text-lg rounded-2xl 
+                                     hover:bg-blue-600 hover:text-white
+                                     border-2 border-blue-600
+                                     transition-all duration-500
+                                     shadow-lg hover:shadow-2xl
+                                     hover:scale-105 active:scale-95
+                                     relative overflow-hidden group/btn"
                         >
-                            🚀 Start Planning My Trip
+                            {/* Button Hover Effect */}
+                            <span className="absolute inset-0 bg-blue-600 transform -translate-x-full 
+                                           group-hover/btn:translate-x-0 transition-transform duration-500"></span>
+                            <span className="relative flex items-center justify-center gap-3">
+                                <span className="group-hover/btn:rotate-12 transition-transform duration-500">🚀</span>
+                                SUBSCRIBE
+                            </span>
                         </button>
+                    </div>
+                    
+                    {/* Privacy Note */}
+                    <div className="mt-8 flex items-center justify-center gap-3 
+                                  text-white group-hover:text-blue-600 
+                                  transition-colors duration-500">
+                        <span className="text-lg">🔒</span>
+                        <span className="text-sm font-medium">
+                            No spam. Unsubscribe anytime. We respect your privacy.
+                        </span>
+                    </div>
+                </form>
 
-                        {/* Privacy Note */}
-                        <p style={{
-                            marginTop: '20px',
-                            fontSize: '0.85rem',
-                            color: colors.textSecondary,
-                            textAlign: 'center',
-                            fontFamily: fonts.body,
-                            lineHeight: '1.6'
-                        }}>
-                            🔒 Your information is secure and will only be used to contact you about your trip.
-                            We respect your privacy.
-                        </p>
-                    </form>
+                {/* Social Proof */}
+                <div className="mt-20 text-center">
+                    <p className="text-gray-600 text-sm mb-6 uppercase tracking-widest">Trusted By</p>
+                    <div className="flex flex-wrap justify-center items-center gap-8">
+                        {[
+                            { name: "Tech Corp", color: "text-blue-600" },
+                            { name: "Startup XYZ", color: "text-blue-600" },
+                            { name: "Dev Agency", color: "text-blue-600" }
+                        ].map((company, index) => (
+                            <div 
+                                key={index}
+                                className="px-6 py-3 bg-white border-2 border-blue-200 rounded-lg
+                                         hover:bg-blue-600 hover:text-white hover:border-blue-600
+                                         transition-all duration-500 cursor-pointer
+                                         group/company"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className={`w-3 h-3 rounded-full bg-blue-600 
+                                                   group-hover/company:bg-white 
+                                                   transition-colors duration-500`}></div>
+                                    <span className="font-semibold text-gray-900 
+                                                   group-hover/company:text-white
+                                                   transition-colors duration-500">
+                                        {company.name}
+                                    </span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
 
+            {/* Animated Dots */}
+            <div className="absolute inset-0 pointer-events-none">
+                {[...Array(30)].map((_, i) => (
+                    <div
+                        key={i}
+                        className="absolute w-2 h-2 bg-blue-200 rounded-full"
+                        style={{
+                            left: `${Math.random() * 100}%`,
+                            top: `${Math.random() * 100}%`,
+                            animation: `pulse ${2 + Math.random() * 2}s infinite`
+                        }}
+                    ></div>
+                ))}
+            </div>
+
+            {/* Custom CSS for animations */}
             <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap');
-
-        /* Responsive */
-        @media (max-width: 768px) {
-          #contact {
-            padding: 80px 20px !important;
-          }
-
-          #contact form > div > div {
-            padding: 50px 30px !important;
-          }
-        }
-
-        @media (max-width: 480px) {
-          #contact {
-            padding: 60px 16px !important;
-          }
-
-          #contact form > div > div {
-            padding: 40px 24px !important;
-          }
-        }
-
-        /* Custom Select Arrow */
-        select {
-          appearance: none;
-          background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234A90E2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-          background-repeat: no-repeat;
-          background-position: right 12px center;
-          background-size: 20px;
-          padding-right: 40px !important;
-        }
-
-        /* Placeholder Color */
-        input::placeholder,
-        textarea::placeholder {
-          color: #6b7280;
-          opacity: 0.7;
-        }
-      `}</style>
+                @keyframes pulse {
+                    0%, 100% { opacity: 0.3; transform: scale(1); }
+                    50% { opacity: 0.6; transform: scale(1.2); }
+                }
+                
+                /* Smooth focus effects */
+                input:focus {
+                    transform: translateY(-2px);
+                    box-shadow: 0 10px 40px rgba(37, 99, 235, 0.1);
+                }
+                
+                /* Card hover effects */
+                div:hover {
+                    z-index: 10;
+                }
+                
+                /* Button shine effect on hover */
+                button:hover::before {
+                    content: '';
+                    position: absolute;
+                    top: -50%;
+                    left: -50%;
+                    width: 200%;
+                    height: 200%;
+                    background: linear-gradient(
+                        45deg,
+                        transparent,
+                        rgba(255, 255, 255, 0.3),
+                        transparent
+                    );
+                    animation: shine 1.5s infinite;
+                }
+                
+                @keyframes shine {
+                    0% { transform: translateX(-100%) rotate(45deg); }
+                    100% { transform: translateX(100%) rotate(45deg); }
+                }
+                
+                /* Smooth transitions for all */
+                * {
+                    transition-property: all;
+                    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+                    transition-duration: 300ms;
+                }
+            `}</style>
         </section>
     );
 };
