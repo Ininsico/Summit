@@ -6,7 +6,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const AboutSection: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<HTMLDivElement[]>([]);
+  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
   const colors = {
     background: '#0a0e27',
@@ -17,7 +17,7 @@ const AboutSection: React.FC = () => {
     accent: '#5BA3D0',
     textPrimary: '#ffffff',
     textSecondary: '#b8c5d6',
-    textLight: '#8FA8C8', // Lighter blue for text
+    textLight: '#8FA8C8',
     border: '#2d3e5f',
   };
 
@@ -26,34 +26,27 @@ const AboutSection: React.FC = () => {
     body: "'Inter', sans-serif",
   };
 
-  const addToCardsRef = (el: HTMLDivElement | null) => {
-    if (el && !cardsRef.current.includes(el)) {
-      cardsRef.current.push(el);
-    }
-  };
-
+  // Simple hover animations only - no scroll triggers
   useEffect(() => {
-    const ctx = gsap.context(() => {
+    // Optional: Add subtle entrance animations after component mounts
+    const timer = setTimeout(() => {
       cardsRef.current.forEach((card, index) => {
-        gsap.fromTo(card,
-          { y: 60, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.8,
-            ease: 'power3.out',
-            delay: index * 0.1,
-            scrollTrigger: {
-              trigger: card,
-              start: 'top 85%',
-              toggleActions: 'play none none reverse',
+        if (card) {
+          gsap.fromTo(card,
+            { opacity: 0.8, y: 20 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.5,
+              delay: index * 0.1,
+              ease: 'power2.out'
             }
-          }
-        );
+          );
+        }
       });
-    });
+    }, 200);
 
-    return () => ctx.revert();
+    return () => clearTimeout(timer);
   }, []);
 
   // SVG Icons
@@ -121,19 +114,19 @@ const AboutSection: React.FC = () => {
   const features = [
     {
       title: "Mountain Adventures",
-      description: "Explore breathtaking peaks and scenic trails. From the Himalayas to the Alps, discover your next summit with expert guides and curated experiences.",
+      description: "Explore Pakistan's legendary peaks including Nanga Parbat (8,126m) and K2 (8,611m). Trek through breathtaking valleys, experience local culture, and conquer the world's most challenging summits with expert local guides.",
       Icon: MountainIcon,
       color: colors.primary,
     },
     {
-      title: "Beach Escapes",
-      description: "Relax on pristine shores and crystal-clear waters. Find your perfect coastal paradise with exclusive beach resorts and water activities.",
+      title: "Desert & Lake Escapes",
+      description: "Discover the stunning Shangrila Desert and crystal-clear lakes of Skardu. Experience the unique blend of golden sand dunes, turquoise waters, and majestic mountain backdrops in Pakistan's northern paradise.",
       Icon: BeachIcon,
       color: colors.accent,
     },
     {
-      title: "Smart Navigation",
-      description: "AI-powered trip planning that adapts to your style. Get personalized itineraries, real-time updates, and local recommendations.",
+      title: "Budget-Friendly Planning",
+      description: "Travel smart without breaking the bank. Get affordable accommodation options, local transport guides, and budget-friendly itineraries that help you explore Pakistan's beauty at minimal cost.",
       Icon: CompassIcon,
       color: colors.secondary,
     }
@@ -141,18 +134,18 @@ const AboutSection: React.FC = () => {
 
   const benefits = [
     {
-      title: "Global Coverage",
-      description: "Access to 195+ countries with verified local guides and authentic experiences",
+      title: "Pakistan Coverage",
+      description: "Explore all provinces with verified local guides and authentic experiences",
       Icon: GlobeIcon
     },
     {
       title: "Capture Moments",
-      description: "Professional photography services available at every destination",
+      description: "Professional photography services at iconic Pakistani destinations",
       Icon: CameraIcon
     },
     {
       title: "Travel Light",
-      description: "Curated packing lists and premium gear rental services worldwide",
+      description: "Curated packing lists and gear rental services across Pakistan",
       Icon: BackpackIcon
     }
   ];
@@ -238,17 +231,17 @@ const AboutSection: React.FC = () => {
           </p>
         </div>
 
-        {/* Feature Cards */}
+        {/* Feature Cards - ALWAYS VISIBLE */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
           gap: '32px',
           marginBottom: '100px'
         }}>
           {features.map((feature, index) => (
             <div
               key={index}
-              ref={addToCardsRef}
+              ref={(el) => { cardsRef.current[index] = el; }}
               style={{
                 backgroundColor: `${colors.surface}dd`,
                 backdropFilter: 'blur(20px)',
@@ -256,7 +249,9 @@ const AboutSection: React.FC = () => {
                 padding: '40px 32px',
                 border: `1px solid ${colors.border}`,
                 transition: 'all 0.3s ease',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                opacity: 1, // ALWAYS VISIBLE
+                transform: 'translateY(0)' // ALWAYS IN POSITION
               }}
               onMouseEnter={(e) => {
                 gsap.to(e.currentTarget, {
@@ -325,14 +320,15 @@ const AboutSection: React.FC = () => {
           ))}
         </div>
 
-        {/* Why Choose Summit Section */}
+        {/* Why Choose Summit Section - ALWAYS VISIBLE */}
         <div style={{
           backgroundColor: `${colors.surface}cc`,
           backdropFilter: 'blur(20px)',
           borderRadius: '32px',
           padding: '60px 40px',
           border: `1px solid ${colors.border}`,
-          marginBottom: '80px'
+          marginBottom: '80px',
+          opacity: 1 // ALWAYS VISIBLE
         }}>
           <h3 style={{
             fontSize: 'clamp(2rem, 4vw, 3rem)',
@@ -350,13 +346,13 @@ const AboutSection: React.FC = () => {
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
             gap: '32px'
           }}>
             {benefits.map((benefit, index) => (
               <div
                 key={index}
-                ref={addToCardsRef}
+                ref={(el) => { cardsRef.current[features.length + index] = el; }}
                 style={{
                   textAlign: 'center',
                   padding: '36px 24px',
@@ -364,7 +360,8 @@ const AboutSection: React.FC = () => {
                   background: `${colors.background}60`,
                   border: `1px solid ${colors.border}`,
                   transition: 'all 0.3s ease',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  opacity: 1 // ALWAYS VISIBLE
                 }}
                 onMouseEnter={(e) => {
                   gsap.to(e.currentTarget, {
@@ -416,22 +413,23 @@ const AboutSection: React.FC = () => {
           </div>
         </div>
 
-        {/* Stats */}
+        {/* Stats - ALWAYS VISIBLE */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '40px',
-          marginBottom: '60px'
+          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+          gap: '30px',
+          marginBottom: '60px',
+          opacity: 1 // ALWAYS VISIBLE
         }}>
           {[
-            { value: '10M+', label: 'Happy Travelers' },
-            { value: '195+', label: 'Countries' },
-            { value: '4.9/5', label: 'Average Rating' },
+            { value: '50K+', label: 'Happy Travelers' },
+            { value: '100+', label: 'Destinations' },
+            { value: '4.8/5', label: 'Average Rating' },
             { value: '24/7', label: 'Support' }
           ].map((stat, index) => (
-            <div key={index} style={{ textAlign: 'center' }} ref={addToCardsRef}>
+            <div key={index} style={{ textAlign: 'center' }}>
               <div style={{
-                fontSize: 'clamp(2.5rem, 5vw, 3.5rem)',
+                fontSize: 'clamp(2rem, 5vw, 3.5rem)',
                 fontWeight: '900',
                 background: `linear-gradient(135deg, ${colors.primaryLight}, ${colors.accent})`,
                 WebkitBackgroundClip: 'text',
@@ -443,7 +441,7 @@ const AboutSection: React.FC = () => {
                 {stat.value}
               </div>
               <div style={{
-                fontSize: '1.1rem',
+                fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
                 color: colors.textLight,
                 fontFamily: fonts.body,
                 fontWeight: '500'
@@ -496,15 +494,81 @@ const AboutSection: React.FC = () => {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap');
 
-        @media (max-width: 768px) {
+        /* Tablet */
+        @media (max-width: 1024px) {
           #about {
-            padding: 80px 16px !important;
+            padding: 100px 24px !important;
           }
         }
 
-        @media (max-width: 480px) {
+        /* Mobile */
+        @media (max-width: 768px) {
+          #about {
+            padding: 80px 20px !important;
+          }
+          
+          /* Force single column for feature cards */
           #about > div > div:nth-child(2) {
             grid-template-columns: 1fr !important;
+            gap: 24px !important;
+          }
+          
+          /* Force single column for benefits */
+          #about > div > div:nth-child(3) {
+            padding: 50px 24px !important;
+          }
+          
+          #about > div > div:nth-child(3) > div:last-child {
+            grid-template-columns: 1fr !important;
+            gap: 24px !important;
+          }
+          
+          /* Stats responsive */
+          #about > div > div:nth-child(4) {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 24px !important;
+          }
+        }
+
+        /* Small Mobile */
+        @media (max-width: 480px) {
+          #about {
+            padding: 60px 16px !important;
+          }
+          
+          /* Header section */
+          #about > div > div:nth-child(1) {
+            margin-bottom: 60px !important;
+          }
+          
+          /* Feature cards padding */
+          #about > div > div:nth-child(2) > div {
+            padding: 32px 24px !important;
+          }
+          
+          /* Benefits section */
+          #about > div > div:nth-child(3) {
+            padding: 40px 20px !important;
+            border-radius: 24px !important;
+          }
+          
+          #about > div > div:nth-child(3) > div:last-child > div {
+            padding: 28px 20px !important;
+          }
+          
+          /* Stats single column on very small screens */
+          #about > div > div:nth-child(4) {
+            grid-template-columns: 1fr !important;
+            gap: 20px !important;
+            margin-bottom: 40px !important;
+          }
+          
+          /* CTA Button */
+          #about > div > div:nth-child(5) button {
+            padding: 18px 40px !important;
+            font-size: 1rem !important;
+            width: 100%;
+            max-width: 300px;
           }
         }
       `}</style>
