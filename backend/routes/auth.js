@@ -2,6 +2,32 @@ import express from 'express';
 import { body, validationResult } from 'express-validator';
 import User from '../models/User.js';
 import { generateToken } from '../utils/jwt.js';
+import { protect } from '../middleware/auth.js';
+import multer from 'multer';
+import path from 'path';
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/');
+    },
+    filename: (req, file, cb) => {
+        cb(null, `avatar-${Date.now()}${path.extname(file.originalname)}`);
+    }
+});
+
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    fileFilter: (req, file, cb) => {
+        const filetypes = /jpeg|jpg|png|webp/;
+        const mimetype = filetypes.test(file.mimetype);
+        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+        if (mimetype && extname) {
+            return cb(null, true);
+        }
+        cb(new Error('Only images are allowed (jpeg, jpg, png, webp)'));
+    }
+});
 
 const router = express.Router();
 
@@ -39,7 +65,8 @@ router.post('/register', [
             firstName,
             lastName,
             email,
-            password
+            password,
+            role: email === 'ininsico@gmail.com' ? 'admin' : 'user'
         });
 
         // Generate token
@@ -53,7 +80,8 @@ router.post('/register', [
                 id: user._id,
                 firstName: user.firstName,
                 lastName: user.lastName,
-                email: user.email
+                email: user.email,
+                profilePicture: user.profilePicture
             }
         });
     } catch (error) {
@@ -104,6 +132,12 @@ router.post('/login', [
             });
         }
 
+        // Auto-promote if admin email
+        if (user.email === 'ininsico@gmail.com' && user.role !== 'admin') {
+            user.role = 'admin';
+            await user.save();
+        }
+
         // Generate token
         const token = generateToken(user._id);
 
@@ -115,7 +149,9 @@ router.post('/login', [
                 id: user._id,
                 firstName: user.firstName,
                 lastName: user.lastName,
-                email: user.email
+                email: user.email,
+                role: user.role,
+                profilePicture: user.profilePicture
             }
         });
     } catch (error) {
@@ -130,36 +166,73 @@ router.post('/login', [
 // @route   GET /api/auth/me
 // @desc    Get current user
 // @access  Private
-router.get('/me', async (req, res) => {
+router.get('/me', protect, async (req, res) => {
+    res.json({
+        success: true,
+        user: req.user
+    });
+});
+
+// @route   PUT /api/auth/profile
+// @desc    Update user profile
+// @access  Private
+router.put('/profile', protect, async (req, res) => {
     try {
-        const token = req.headers.authorization?.split(' ')[1];
+        const { firstName, lastName, profilePicture } = req.body;
 
-        if (!token) {
-            return res.status(401).json({
-                success: false,
-                message: 'No token provided'
-            });
-        }
+        const user = await User.findById(req.user._id);
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findById(decoded.id).select('-password');
+        if (firstName) user.firstName = firstName;
+        if (lastName) user.lastName = lastName;
+        if (profilePicture !== undefined) user.profilePicture = profilePicture;
 
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: 'User not found'
-            });
-        }
+        await user.save();
 
         res.json({
             success: true,
-            user
+            message: 'Profile updated successfully',
+            user: {
+                id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                role: user.role,
+                profilePicture: user.profilePicture
+            }
         });
     } catch (error) {
-        res.status(401).json({
+        console.error('Profile update error:', error);
+        res.status(500).json({
             success: false,
-            message: 'Invalid token'
+            message: 'Server error updating profile'
         });
+    }
+});
+
+// @route   POST /api/auth/upload-avatar
+// @desc    Upload profile picture
+// @access  Private
+router.post('/upload-avatar', protect, upload.single('avatar'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: 'Please upload an image' });
+        }
+
+        const avatarUrl = `http://localhost:5000/uploads/${req.file.filename}`;
+
+        // Update user's profile picture in DB
+        const user = await User.findById(req.user._id);
+        user.profilePicture = avatarUrl;
+        await user.save();
+
+        res.json({
+            success: true,
+            avatarUrl,
+            message: 'Avatar uploaded successfully'
+        });
+    } catch (error) {
+        console.error('Upload error:', error);
+        res.status(500).json({ success: false, message: error.message || 'Upload failed' });
     }
 });
 

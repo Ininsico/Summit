@@ -1,9 +1,13 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import connectDB from './config/db.js';
 import authRoutes from './routes/auth.js';
 import bookingRoutes from './routes/bookings.js';
+import adminRoutes from './routes/admin.js';
+import destinationRoutes from './routes/destinations.js';
 
 // Load environment variables
 dotenv.config();
@@ -22,9 +26,15 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/bookings', bookingRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/destinations', destinationRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {

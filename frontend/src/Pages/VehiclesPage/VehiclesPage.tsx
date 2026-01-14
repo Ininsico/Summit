@@ -4,12 +4,46 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../../Componenets/Header';
 import Footer from '../LandingPage/Footer';
 import { theme } from '../../theme/ThemeSystem';
+import { useAppStore } from '../../store/useAppStore';
+import { bookingAPI } from '../../services/api';
 
 const VehiclesPage = () => {
+    const { isAuthenticated } = useAppStore();
     const colors = theme.getColors();
     const fonts = theme.getFonts();
     const navigate = useNavigate();
     const [tripType, setTripType] = useState<'private' | 'shared'>('private');
+
+    const handleBooking = async (vehicle: any) => {
+        if (!isAuthenticated) {
+            navigate('/auth');
+            return;
+        }
+
+        try {
+            const startDate = new Date();
+            const endDate = new Date();
+            endDate.setDate(startDate.getDate() + 1); // 1 day default
+
+            const bookingData = {
+                type: 'vehicle',
+                tripType,
+                itemName: vehicle.name,
+                startDate: startDate.toISOString(),
+                endDate: endDate.toISOString(),
+                guests: parseInt(vehicle.capacity), // Extracting number from "X Passengers"
+                totalPrice: tripType === 'shared' ? vehicle.sharedPrice : vehicle.pricePerDay
+            };
+
+            const response: any = await bookingAPI.create(bookingData);
+            if (response.success) {
+                alert(`Successfully booked ${vehicle.name}!`);
+            }
+        } catch (error: any) {
+            console.error('Booking error:', error);
+            alert(error.message || 'Error creating booking');
+        }
+    };
 
     const vehicles = [
         {
@@ -539,7 +573,7 @@ const VehiclesPage = () => {
                                             )}
                                         </div>
                                         <button
-                                            onClick={() => navigate('/auth')}
+                                            onClick={() => handleBooking(vehicle)}
                                             style={{
                                                 padding: '14px 28px',
                                                 borderRadius: '12px',

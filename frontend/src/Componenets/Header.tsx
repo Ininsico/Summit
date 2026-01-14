@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { theme } from '../theme/ThemeSystem';
+import { useAppStore } from '../store/useAppStore';
 
 const Header = () => {
+  const { isAuthenticated, user, logout } = useAppStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -21,6 +23,7 @@ const Header = () => {
     { label: 'Destinations', path: '/destinations' },
     { label: 'Vehicles', path: '/vehicles' },
     { label: 'About', path: '/about' },
+    ...(user?.email === 'ininsico@gmail.com' ? [{ label: 'Admin', path: '/admin' }] : []),
   ];
 
   const handleNavClick = (path: string) => {
@@ -172,34 +175,64 @@ const Header = () => {
                 {item.label}
               </Link>
             ))}
-            <button
-              onClick={() => navigate('/auth')}
-              style={{
-                background: theme.getGradient(),
-                color: colors.textPrimary,
-                border: 'none',
-                padding: 'clamp(12px, 1.5vw, 14px) clamp(24px, 3vw, 32px)',
-                borderRadius: '50px',
-                fontSize: 'clamp(13px, 1.5vw, 15px)',
-                fontWeight: '700',
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                boxShadow: `0 6px 20px ${colors.primary}40`,
-                fontFamily: fonts.body,
-                transition: 'all 0.3s ease',
-                letterSpacing: '0.3px',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-3px) scale(1.05)';
-                e.currentTarget.style.boxShadow = `0 12px 30px ${colors.primary}60`;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                e.currentTarget.style.boxShadow = `0 6px 20px ${colors.primary}40`;
-              }}
-            >
-              Book Now
-            </button>
+            {isAuthenticated ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <span style={{
+                  color: colors.textPrimary,
+                  fontWeight: '600',
+                  fontSize: '0.9rem'
+                }}>
+                  Hi, {user?.firstName}
+                </span>
+                <button
+                  onClick={logout}
+                  style={{
+                    background: 'rgba(255,255,255,0.1)',
+                    color: colors.textPrimary,
+                    border: `1px solid ${colors.border}`,
+                    padding: '10px 20px',
+                    borderRadius: '50px',
+                    fontSize: '0.85rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => navigate('/auth')}
+                style={{
+                  background: theme.getGradient(),
+                  color: colors.textPrimary,
+                  border: 'none',
+                  padding: 'clamp(12px, 1.5vw, 14px) clamp(24px, 3vw, 32px)',
+                  borderRadius: '50px',
+                  fontSize: 'clamp(13px, 1.5vw, 15px)',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  boxShadow: `0 6px 20px ${colors.primary}40`,
+                  fontFamily: fonts.body,
+                  transition: 'all 0.3s ease',
+                  letterSpacing: '0.3px',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-3px) scale(1.05)';
+                  e.currentTarget.style.boxShadow = `0 12px 30px ${colors.primary}60`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                  e.currentTarget.style.boxShadow = `0 6px 20px ${colors.primary}40`;
+                }}
+              >
+                Book Now
+              </button>
+            )}
           </nav>
 
           {/* Mobile Menu Button */}

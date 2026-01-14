@@ -11,6 +11,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         trim: true
     },
+    profilePicture: {
+        type: String,
+        default: ''
+    },
     email: {
         type: String,
         required: [true, 'Email is required'],
@@ -24,6 +28,11 @@ const userSchema = new mongoose.Schema({
         required: [true, 'Password is required'],
         minlength: [6, 'Password must be at least 6 characters'],
         select: false
+    },
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user'
     },
     bookings: [{
         type: mongoose.Schema.Types.ObjectId,

@@ -5,6 +5,8 @@ import AboutPage from './Pages/AboutPage/AboutPage';
 import DestinationsPage from './Pages/DestinationsPage/DestinationsPage';
 import VehiclesPage from './Pages/VehiclesPage/VehiclesPage';
 import AuthPage from './Pages/AuthPage/AuthPage';
+import DashboardPage from './Pages/Dashboard/DashboardPage';
+import AdminDashboard from './Pages/Admin/AdminDashboard';
 import { useAppStore } from './store/useAppStore';
 import { shouldReduceAnimations } from './utils/performanceUtils';
 import { initGSAPDefaults } from './utils/gsapUtils';
@@ -61,6 +63,8 @@ const App = () => {
           <Route path='/destinations' element={<DestinationsPage />}></Route>
           <Route path='/vehicles' element={<VehiclesPage />}></Route>
           <Route path='/auth' element={<AuthPage />}></Route>
+          <Route path='/dashboard' element={<DashboardPage />}></Route>
+          <Route path='/admin' element={<AdminDashboard />}></Route>
         </Routes>
       </div>
     </Router>

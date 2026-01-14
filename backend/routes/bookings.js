@@ -20,6 +20,7 @@ router.post('/', protect, [
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
+            console.log('Validation errors:', errors.array());
             return res.status(400).json({ success: false, errors: errors.array() });
         }
 
@@ -125,6 +126,32 @@ router.patch('/:id/cancel', protect, async (req, res) => {
     } catch (error) {
         console.error('Cancel booking error:', error);
         res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+// @route   PUT /api/bookings/:id
+// @desc    Update a booking
+// @access  Private
+router.put('/:id', protect, async (req, res) => {
+    try {
+        const booking = await Booking.findOneAndUpdate(
+            { _id: req.params.id, user: req.user._id },
+            { $set: req.body },
+            { new: true, runValidators: true }
+        );
+
+        if (!booking) {
+            return res.status(404).json({ success: false, message: 'Booking not found' });
+        }
+
+        res.json({
+            success: true,
+            message: 'Booking updated successfully',
+            booking
+        });
+    } catch (error) {
+        console.error('Update booking error:', error);
+        res.status(500).json({ success: false, message: 'Server error updating booking' });
     }
 });
 

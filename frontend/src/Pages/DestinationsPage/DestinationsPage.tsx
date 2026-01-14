@@ -1,106 +1,70 @@
-// DestinationsPage.tsx - Comprehensive destinations showcase
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../../Componenets/Header';
 import Footer from '../LandingPage/Footer';
 import { theme } from '../../theme/ThemeSystem';
+import { useAppStore } from '../../store/useAppStore';
+import { bookingAPI, destinationAPI } from '../../services/api';
 
 const DestinationsPage = () => {
+    const { isAuthenticated } = useAppStore();
     const colors = theme.getColors();
     const fonts = theme.getFonts();
+    const navigate = useNavigate();
     const [selectedCategory, setSelectedCategory] = useState('All');
+    const [destinations, setDestinations] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchDestinations = async () => {
+            try {
+                const res: any = await destinationAPI.getAll();
+                if (res.success) {
+                    setDestinations(res.destinations);
+                }
+            } catch (error) {
+                console.error('Failed to fetch destinations', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchDestinations();
+    }, []);
+
+    const handleBooking = async (dest: any) => {
+        if (!isAuthenticated) {
+            navigate('/auth');
+            return;
+        }
+
+        try {
+            const startDate = new Date();
+            const endDate = new Date();
+            endDate.setDate(startDate.getDate() + 7); // 7 days default
+
+            const bookingData = {
+                type: 'destination',
+                itemName: dest.name,
+                destination: dest.location,
+                startDate: startDate.toISOString(),
+                endDate: endDate.toISOString(),
+                guests: 2, // Default
+                totalPrice: 50000 // Placeholder price for destinations
+            };
+
+            const response: any = await bookingAPI.create(bookingData);
+            if (response.success) {
+                alert(`Successfully booked trip to ${dest.name}!`);
+            }
+        } catch (error: any) {
+            console.error('Booking error:', error);
+            alert(error.message || 'Error creating booking');
+        }
+    };
 
     const categories = ['All', 'Mountains', 'Valleys', 'Lakes', 'Historical'];
 
-    const destinations = [
-        {
-            name: 'Hunza Valley',
-            category: 'Valleys',
-            location: 'Gilgit-Baltistan',
-            description: 'A breathtaking valley surrounded by snow-capped peaks, ancient forts, and vibrant apricot orchards.',
-            highlights: ['Altit Fort', 'Baltit Fort', 'Attabad Lake', 'Passu Cones'],
-            bestTime: 'April - October',
-            difficulty: 'Easy',
-            duration: '5-7 Days',
-            image: '/hunza.jpg'
-        },
-        {
-            name: 'Fairy Meadows',
-            category: 'Mountains',
-            location: 'Gilgit-Baltistan',
-            description: 'One of the most beautiful alpine meadows with stunning views of Nanga Parbat, the 9th highest mountain.',
-            highlights: ['Nanga Parbat Base Camp', 'Beyal Camp', 'Raikot Glacier'],
-            bestTime: 'May - September',
-            difficulty: 'Moderate',
-            duration: '3-4 Days',
-            image: '/fairy-medows.jpg'
-        },
-        {
-            name: 'Skardu',
-            category: 'Mountains',
-            location: 'Gilgit-Baltistan',
-            description: 'Gateway to some of the highest peaks on Earth, including K2. A paradise for mountaineers and adventurers.',
-            highlights: ['Shangrila Resort', 'Satpara Lake', 'Deosai Plains', 'Shigar Fort'],
-            bestTime: 'April - October',
-            difficulty: 'Moderate',
-            duration: '6-8 Days',
-            image: '/skardu.jpg'
-        },
-        {
-            name: 'Nanga Parbat',
-            category: 'Mountains',
-            location: 'Gilgit-Baltistan',
-            description: 'The "Killer Mountain" - 9th highest peak in the world, offering challenging treks and spectacular views.',
-            highlights: ['Base Camp Trek', 'Rupal Face', 'Diamir Face', 'Fairy Meadows'],
-            bestTime: 'June - September',
-            difficulty: 'Hard',
-            duration: '7-10 Days',
-            image: '/NangaParbat.jpg'
-        },
-        {
-            name: 'Neelum Valley',
-            category: 'Valleys',
-            location: 'Azad Kashmir',
-            description: 'A stunning valley along the Neelum River with dense forests, waterfalls, and picturesque villages.',
-            highlights: ['Arang Kel', 'Sharda', 'Kel', 'Taobat'],
-            bestTime: 'April - October',
-            difficulty: 'Easy',
-            duration: '5-6 Days',
-            image: '/neelumvalley.jpg'
-        },
-        {
-            name: 'Rakaposhi',
-            category: 'Mountains',
-            location: 'Gilgit-Baltistan',
-            description: 'The 27th highest mountain in the world, known for its perfect pyramid shape and stunning beauty.',
-            highlights: ['Rakaposhi Base Camp', 'Minapin Glacier', 'Diran Peak', 'Nagar Valley'],
-            bestTime: 'May - September',
-            difficulty: 'Moderate',
-            duration: '4-6 Days',
-            image: '/Rakaposhi.jpg'
-        },
-        {
-            name: 'Mohenjo-daro',
-            category: 'Historical',
-            location: 'Sindh',
-            description: 'Ancient Indus Valley Civilization site, a UNESCO World Heritage Site dating back to 2500 BCE.',
-            highlights: ['Great Bath', 'Assembly Hall', 'Museum', 'Ancient Streets'],
-            bestTime: 'November - February',
-            difficulty: 'Easy',
-            duration: '1 Day',
-            image: '/Mohenjo-daro.jpg'
-        },
-        {
-            name: 'Naran Kaghan',
-            category: 'Valleys',
-            location: 'Khyber Pakhtunkhwa',
-            description: 'Popular tourist destination with beautiful valleys, lakes, and the famous Babusar Pass.',
-            highlights: ['Lake Saif ul Malook', 'Babusar Top', 'Lulusar Lake', 'Ansoo Lake'],
-            bestTime: 'May - September',
-            difficulty: 'Moderate',
-            duration: '4-5 Days',
-            image: '/naran.jpg'
-        }
-    ];
+
 
     const filteredDestinations = selectedCategory === 'All'
         ? destinations
@@ -451,6 +415,7 @@ const DestinationsPage = () => {
 
                                     {/* CTA Button */}
                                     <button
+                                        onClick={() => handleBooking(destination)}
                                         style={{
                                             width: '100%',
                                             padding: '16px',

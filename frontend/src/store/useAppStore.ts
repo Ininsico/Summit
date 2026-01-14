@@ -6,6 +6,8 @@ interface User {
     firstName: string;
     lastName?: string;
     email: string;
+    profilePicture?: string;
+    role?: string;
 }
 
 interface AppState {

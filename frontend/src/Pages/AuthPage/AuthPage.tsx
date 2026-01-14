@@ -62,7 +62,12 @@ const AuthPage = () => {
                 if (response.success) {
                     setToken(response.token);
                     setUser(response.user);
-                    navigate('/');
+                    // Redirect based on role
+                    if (response.user.role === 'admin') {
+                        navigate('/admin');
+                    } else {
+                        navigate('/dashboard');
+                    }
                 }
             } else {
                 const response: any = await authAPI.login({
@@ -72,7 +77,12 @@ const AuthPage = () => {
                 if (response.success) {
                     setToken(response.token);
                     setUser(response.user);
-                    navigate('/');
+                    // Redirect based on role
+                    if (response.user.role === 'admin') {
+                        navigate('/admin');
+                    } else {
+                        navigate('/dashboard');
+                    }
                 }
             }
         } catch (err: any) {
