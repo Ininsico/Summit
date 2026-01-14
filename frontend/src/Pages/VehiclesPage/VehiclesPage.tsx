@@ -1,5 +1,6 @@
 // VehiclesPage.tsx - Dedicated vehicles rental page with real images and shared trip option
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../../Componenets/Header';
 import Footer from '../LandingPage/Footer';
 import { theme } from '../../theme/ThemeSystem';
@@ -7,6 +8,7 @@ import { theme } from '../../theme/ThemeSystem';
 const VehiclesPage = () => {
     const colors = theme.getColors();
     const fonts = theme.getFonts();
+    const navigate = useNavigate();
     const [tripType, setTripType] = useState<'private' | 'shared'>('private');
 
     const vehicles = [
@@ -537,6 +539,7 @@ const VehiclesPage = () => {
                                             )}
                                         </div>
                                         <button
+                                            onClick={() => navigate('/auth')}
                                             style={{
                                                 padding: '14px 28px',
                                                 borderRadius: '12px',

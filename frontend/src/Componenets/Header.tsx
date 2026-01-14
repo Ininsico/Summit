@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { theme } from '../theme/ThemeSystem';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const colors = theme.getColors();
   const fonts = theme.getFonts();
@@ -172,6 +173,7 @@ const Header = () => {
               </Link>
             ))}
             <button
+              onClick={() => navigate('/auth')}
               style={{
                 background: theme.getGradient(),
                 color: colors.textPrimary,

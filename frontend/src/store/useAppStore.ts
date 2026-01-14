@@ -1,7 +1,22 @@
 // Global store for Summit application using Zustand
 import { create } from 'zustand';
 
+interface User {
+    id: string;
+    firstName: string;
+    lastName?: string;
+    email: string;
+}
+
 interface AppState {
+    // Auth State
+    user: User | null;
+    token: string | null;
+    isAuthenticated: boolean;
+    setUser: (user: User | null) => void;
+    setToken: (token: string | null) => void;
+    logout: () => void;
+
     // UI State
     isLoading: boolean;
     setIsLoading: (loading: boolean) => void;
@@ -24,6 +39,26 @@ interface AppState {
 }
 
 export const useAppStore = create<AppState>((set) => ({
+    // Auth State
+    user: JSON.parse(localStorage.getItem('user') || 'null'),
+    token: localStorage.getItem('token'),
+    isAuthenticated: !!localStorage.getItem('token'),
+    setUser: (user) => {
+        if (user) localStorage.setItem('user', JSON.stringify(user));
+        else localStorage.removeItem('user');
+        set({ user, isAuthenticated: !!user });
+    },
+    setToken: (token) => {
+        if (token) localStorage.setItem('token', token);
+        else localStorage.removeItem('token');
+        set({ token, isAuthenticated: !!token });
+    },
+    logout: () => {
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        set({ user: null, token: null, isAuthenticated: false });
+    },
+
     // UI State
     isLoading: true,
     setIsLoading: (loading) => set({ isLoading: loading }),
