@@ -1,78 +1,15 @@
 // CTASection.tsx - Premium travel-themed CTA section
-import { useState, useRef, useEffect } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useAppStore } from '../../store/useAppStore';
-
-gsap.registerPlugin(ScrollTrigger);
+import { useState } from 'react';
+import { theme } from '../../theme/ThemeSystem';
 
 const CTASection = () => {
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
-  const { reducedMotion } = useAppStore();
 
-  const colors = {
-    background: '#0a0e27',
-    surface: '#141b3d',
-    primary: '#4A90E2',
-    primaryLight: '#6BA3E8',
-    secondary: '#2E5C8A',
-    accent: '#5BA3D0',
-    textPrimary: '#ffffff',
-    textSecondary: '#b8c5d6',
-    border: '#2d3e5f',
-  };
-
-  const fonts = {
-    title: "'Outfit', 'Inter', sans-serif",
-    body: "'Inter', sans-serif",
-  };
-
-  useEffect(() => {
-    if (reducedMotion) return; // Skip animations if reduced motion is preferred
-
-    const ctx = gsap.context(() => {
-      // Main Box Entrance - Optimized
-      gsap.fromTo('.cta-main-box',
-        { y: 30, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: '.cta-main-box',
-            start: 'top 85%',
-            toggleActions: 'play none none none',
-            once: true, // Only animate once for performance
-          }
-        }
-      );
-
-      // Cards Entrance - Optimized
-      gsap.fromTo('.feature-mini-card',
-        { y: 20, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.6,
-          stagger: 0.15,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: '.feature-mini-card',
-            start: 'top 90%',
-            toggleActions: 'play none none none',
-            once: true, // Only animate once for performance
-          }
-        }
-      );
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, [reducedMotion]);
+  // Use centralized theme system (OOP - Encapsulation & Abstraction)
+  const colors = theme.getColors();
+  const fonts = theme.getFonts();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,7 +50,6 @@ const CTASection = () => {
 
   return (
     <section
-      ref={sectionRef}
       id="cta"
       style={{
         position: 'relative',
@@ -155,7 +91,6 @@ const CTASection = () => {
       }}>
         {/* Main CTA Box */}
         <div
-          className="cta-main-box"
           style={{
             background: `linear-gradient(135deg, ${colors.surface}ee, ${colors.background}ee)`,
             backdropFilter: 'blur(20px)',
@@ -164,8 +99,7 @@ const CTASection = () => {
             border: `1px solid ${colors.border}`,
             textAlign: 'center',
             boxShadow: '0 30px 60px rgba(0,0,0,0.3)',
-            marginBottom: '60px',
-            opacity: 1
+            marginBottom: '60px'
           }}>
           <h2 style={{
             fontSize: 'clamp(2.5rem, 5vw, 4.5rem)',
@@ -330,8 +264,6 @@ const CTASection = () => {
           ].map((feature, idx) => (
             <div
               key={idx}
-              className="feature-mini-card"
-              ref={(el) => { cardsRef.current[idx] = el; }}
               style={{
                 background: `${colors.surface}80`,
                 backdropFilter: 'blur(10px)',
@@ -339,8 +271,7 @@ const CTASection = () => {
                 padding: '32px',
                 border: `1px solid ${colors.border}`,
                 transition: 'all 0.3s ease',
-                cursor: 'pointer',
-                opacity: 1
+                cursor: 'pointer'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-5px)';

@@ -1,22 +1,10 @@
 // Footer.tsx - Premium travel-themed footer
+import { theme } from '../../theme/ThemeSystem';
 
 const Footer = () => {
-    const colors = {
-        background: '#0a0e27',
-        surface: '#141b3d',
-        primary: '#4A90E2',
-        primaryLight: '#6BA3E8',
-        secondary: '#2E5C8A',
-        accent: '#5BA3D0',
-        textPrimary: '#ffffff',
-        textSecondary: '#b8c5d6',
-        border: '#2d3e5f',
-    };
-
-    const fonts = {
-        title: "'Outfit', 'Inter', sans-serif",
-        body: "'Inter', sans-serif",
-    };
+    // Use centralized theme system (OOP - Encapsulation & Abstraction)
+    const colors = theme.getColors();
+    const fonts = theme.getFonts();
 
     const footerLinks = {
         explore: [

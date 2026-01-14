@@ -1,140 +1,321 @@
-import React, { useEffect, useState } from 'react';
-import { gsap } from 'gsap';
-import './Header.css';
+import { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { theme } from '../theme/ThemeSystem';
 
-const Header: React.FC = () => {
+const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
 
-  // Blue travel-themed colors
-  const colors = {
-    primary: '#4A90E2',
-    primaryLight: '#6BA3E8',
-    secondary: '#2E5C8A',
-    accent: '#5BA3D0',
-    dark: '#0a0e27',
-    darkBlue: '#141b3d',
-    white: '#FFFFFF',
-    textLight: '#b8c5d6',
-    glass: 'rgba(10, 14, 39, 0.95)'
-  };
+  const colors = theme.getColors();
+  const fonts = theme.getFonts();
 
-  // Handle scroll effect
+  // Close mobile menu on route change
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
+    setIsMobileMenuOpen(false);
+  }, [location]);
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Close mobile menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (isMobileMenuOpen && !target.closest('.header-container')) {
-        setIsMobileMenuOpen(false);
-      }
-    };
-
-    if (isMobileMenuOpen) {
-      document.addEventListener('click', handleClickOutside);
-      return () => document.removeEventListener('click', handleClickOutside);
-    }
-  }, [isMobileMenuOpen]);
-
-  // Navigation items
+  // Navigation items with proper routing
   const navItems = [
-    { label: 'Destinations', href: '#destinations' },
-    { label: 'Plan Trip', href: '#plan' },
-    { label: 'Experiences', href: '#experiences' },
-    { label: 'About', href: '#about' },
-    { label: 'Contact', href: '#contact' }
+    { label: 'Home', path: '/' },
+    { label: 'Destinations', path: '/#destinations' },
+    { label: 'Trips', path: '/#trips' },
+    { label: 'Hotels', path: '/#hotels' },
+    { label: 'About', path: '/about' },
   ];
 
-  const handleNavClick = (href: string) => {
+  const handleNavClick = (path: string) => {
     setIsMobileMenuOpen(false);
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+
+    // Handle hash links for same-page navigation
+    if (path.includes('#')) {
+      const [route, hash] = path.split('#');
+      if (route === '' || route === location.pathname) {
+        const element = document.getElementById(hash);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
     }
+  };
+
+  const isActive = (path: string) => {
+    if (path === '/') return location.pathname === '/';
+    return location.pathname === path || location.pathname.startsWith(path);
   };
 
   return (
     <>
-      <header className={`header-container ${scrolled ? 'scrolled' : ''}`}>
-        <div className="header-content">
+      <header
+        style={{
+          position: 'relative',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 100,
+          background: `linear-gradient(135deg, ${colors.background}f5, ${colors.surface}f0)`,
+          backdropFilter: 'blur(25px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(25px) saturate(180%)',
+          borderBottom: `1px solid ${colors.primary}40`,
+          boxShadow: '0 4px 40px rgba(0, 0, 0, 0.3)',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        }}
+      >
+        <div
+          style={{
+            maxWidth: '1400px',
+            margin: '0 auto',
+            padding: '0 clamp(16px, 4vw, 40px)',
+            height: 'clamp(65px, 10vw, 80px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
           {/* Logo */}
-          <div
-            className="logo-container"
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          <Link
+            to="/"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'clamp(10px, 2vw, 14px)',
+              textDecoration: 'none',
+              transition: 'transform 0.2s ease',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
           >
-            <div className="logo-image-wrapper">
+            <div
+              style={{
+                width: 'clamp(36px, 6vw, 50px)',
+                height: 'clamp(36px, 6vw, 50px)',
+                borderRadius: '14px',
+                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: `linear-gradient(135deg, ${colors.primary}25, ${colors.secondary}20)`,
+                border: `2px solid ${colors.primary}40`,
+                position: 'relative',
+                transition: 'all 0.3s ease',
+              }}
+            >
               <img
                 src="/Summit.png"
                 alt="Summit Logo"
-                className="logo-image"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  filter: 'brightness(1.1)',
+                }}
               />
-              <div className="logo-shine" />
             </div>
-            <span className="logo-text">Summit</span>
-          </div>
+            <span
+              style={{
+                fontSize: 'clamp(20px, 4vw, 32px)',
+                fontWeight: '900',
+                background: theme.getGradient(),
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                letterSpacing: '-0.5px',
+                whiteSpace: 'nowrap',
+                fontFamily: fonts.title,
+              }}
+            >
+              Summit
+            </span>
+          </Link>
 
           {/* Desktop Navigation */}
-          <nav className="desktop-nav">
+          <nav
+            style={{
+              display: 'flex',
+              gap: 'clamp(20px, 3vw, 36px)',
+              alignItems: 'center',
+            }}
+            className="desktop-nav"
+          >
             {navItems.map((item) => (
-              <a
+              <Link
                 key={item.label}
-                href={item.href}
-                className="nav-link"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavClick(item.href);
+                to={item.path}
+                onClick={() => handleNavClick(item.path)}
+                style={{
+                  color: isActive(item.path) ? colors.primary : colors.textPrimary,
+                  textDecoration: 'none',
+                  fontSize: 'clamp(14px, 1.5vw, 16px)',
+                  fontWeight: '600',
+                  padding: '10px 18px',
+                  borderRadius: '12px',
+                  transition: 'all 0.3s ease',
+                  whiteSpace: 'nowrap',
+                  position: 'relative',
+                  fontFamily: fonts.body,
+                  background: isActive(item.path)
+                    ? `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}10)`
+                    : 'transparent',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = colors.primary;
+                  e.currentTarget.style.transform = 'translateY(-3px) scale(1.05)';
+                  e.currentTarget.style.background = `linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}10)`;
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive(item.path)) {
+                    e.currentTarget.style.color = colors.textPrimary;
+                    e.currentTarget.style.background = 'transparent';
+                  }
+                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
                 }}
               >
                 {item.label}
-              </a>
+              </Link>
             ))}
-            <button className="cta-button">
-              <span>Book Now</span>
-              <div className="button-glow" />
+            <button
+              style={{
+                background: theme.getGradient(),
+                color: colors.textPrimary,
+                border: 'none',
+                padding: 'clamp(12px, 1.5vw, 14px) clamp(24px, 3vw, 32px)',
+                borderRadius: '50px',
+                fontSize: 'clamp(13px, 1.5vw, 15px)',
+                fontWeight: '700',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                boxShadow: `0 6px 20px ${colors.primary}40`,
+                fontFamily: fonts.body,
+                transition: 'all 0.3s ease',
+                letterSpacing: '0.3px',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-3px) scale(1.05)';
+                e.currentTarget.style.boxShadow = `0 12px 30px ${colors.primary}60`;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                e.currentTarget.style.boxShadow = `0 6px 20px ${colors.primary}40`;
+              }}
+            >
+              Book Now
             </button>
           </nav>
 
           {/* Mobile Menu Button */}
           <button
-            className="mobile-menu-button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle menu"
+            className="mobile-menu-button"
+            style={{
+              display: 'none',
+              background: 'rgba(255,255,255,0.1)',
+              border: 'none',
+              padding: '12px',
+              borderRadius: '10px',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+            }}
           >
-            <div className={`hamburger ${isMobileMenuOpen ? 'active' : ''}`}>
-              <span></span>
-              <span></span>
-              <span></span>
+            <div style={{
+              width: '24px',
+              height: '20px',
+              position: 'relative',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+            }}>
+              <span style={{
+                display: 'block',
+                width: '100%',
+                height: '2px',
+                background: colors.textPrimary,
+                borderRadius: '2px',
+                transition: 'all 0.3s ease',
+                transform: isMobileMenuOpen ? 'translateY(9px) rotate(45deg)' : 'none',
+              }} />
+              <span style={{
+                display: 'block',
+                width: '100%',
+                height: '2px',
+                background: colors.textPrimary,
+                borderRadius: '2px',
+                transition: 'all 0.3s ease',
+                opacity: isMobileMenuOpen ? 0 : 1,
+              }} />
+              <span style={{
+                display: 'block',
+                width: '100%',
+                height: '2px',
+                background: colors.textPrimary,
+                borderRadius: '2px',
+                transition: 'all 0.3s ease',
+                transform: isMobileMenuOpen ? 'translateY(-9px) rotate(-45deg)' : 'none',
+              }} />
             </div>
           </button>
         </div>
 
         {/* Mobile Navigation */}
-        <div className={`mobile-nav ${isMobileMenuOpen ? 'active' : ''}`}>
-          <div className="mobile-nav-content">
+        <div
+          style={{
+            maxHeight: isMobileMenuOpen ? '500px' : '0',
+            overflow: 'hidden',
+            background: `linear-gradient(135deg, ${colors.background}, ${colors.surface})`,
+            backdropFilter: 'blur(30px)',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4)',
+            borderBottom: `1px solid ${colors.primary}30`,
+            transition: 'max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+          }}
+          className="mobile-nav"
+        >
+          <div style={{
+            padding: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+          }}>
             {navItems.map((item) => (
-              <a
+              <Link
                 key={item.label}
-                href={item.href}
-                className="mobile-nav-link"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavClick(item.href);
+                to={item.path}
+                onClick={() => handleNavClick(item.path)}
+                style={{
+                  color: isActive(item.path) ? colors.primary : colors.textPrimary,
+                  textDecoration: 'none',
+                  fontSize: '18px',
+                  fontWeight: '600',
+                  padding: '20px 0',
+                  borderBottom: `1px solid ${colors.primary}20`,
+                  transition: 'all 0.3s ease',
+                  fontFamily: fonts.body,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '15px',
                 }}
               >
-                <div className="mobile-nav-dot" />
+                <div style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  background: colors.primary,
+                  opacity: isActive(item.path) ? 1 : 0.5,
+                }} />
                 {item.label}
-              </a>
+              </Link>
             ))}
             <button
-              className="mobile-cta-button"
+              style={{
+                background: theme.getGradient(),
+                color: colors.textPrimary,
+                border: 'none',
+                padding: '18px 32px',
+                borderRadius: '50px',
+                fontSize: '16px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                marginTop: '25px',
+                fontFamily: fonts.body,
+                boxShadow: `0 6px 20px ${colors.primary}40`,
+              }}
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Book Now
@@ -145,393 +326,21 @@ const Header: React.FC = () => {
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap');
-        
-        * {
-          -webkit-font-smoothing: antialiased;
-          -moz-osx-font-smoothing: grayscale;
-        }
-
-        .header-container {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          z-index: 1000;
-          background: linear-gradient(135deg, ${colors.glass}, ${colors.darkBlue}ee);
-          backdrop-filter: blur(25px) saturate(180%);
-          -webkit-backdrop-filter: blur(25px) saturate(180%);
-          border-bottom: 1px solid ${colors.primary}30;
-          box-shadow: 0 4px 40px rgba(0, 0, 0, 0.3);
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .header-container.scrolled {
-          box-shadow: 0 8px 50px rgba(0, 0, 0, 0.5);
-          border-bottom-color: ${colors.primary}50;
-        }
-
-        .header-content {
-          max-width: 1400px;
-          margin: 0 auto;
-          padding: 0 40px;
-          height: 80px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-        }
-
-        /* Logo Styles */
-        .logo-container {
-          display: flex;
-          align-items: center;
-          gap: 14px;
-          cursor: pointer;
-          transition: transform 0.2s ease;
-        }
-
-        .logo-container:hover {
-          transform: scale(1.02);
-        }
-
-        .logo-image-wrapper {
-          width: 50px;
-          height: 50px;
-          border-radius: 14px;
-          overflow: hidden;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: linear-gradient(135deg, ${colors.primary}25, ${colors.secondary}20);
-          border: 2px solid ${colors.primary}40;
-          position: relative;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .logo-image-wrapper:hover {
-          transform: scale(1.1) rotate(5deg);
-          border-color: ${colors.primary};
-          box-shadow: 0 8px 25px ${colors.primary}40;
-        }
-
-        .logo-image {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          filter: brightness(1.1);
-        }
-
-        .logo-shine {
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 50%;
-          height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-          transform: skewX(-20deg);
-          transition: left 0.6s ease;
-        }
-
-        .logo-image-wrapper:hover .logo-shine {
-          left: 150%;
-        }
-
-        .logo-text {
-          font-size: 32px;
-          font-weight: 900;
-          background: linear-gradient(135deg, ${colors.primary}, ${colors.accent}, ${colors.secondary});
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          letter-spacing: -0.5px;
-          white-space: nowrap;
-          font-family: 'Outfit', sans-serif;
-          text-shadow: 0 2px 10px rgba(74, 144, 226, 0.2);
-        }
-
-        /* Desktop Navigation */
-        .desktop-nav {
-          display: flex;
-          gap: 36px;
-          align-items: center;
-        }
-
-        .nav-link {
-          color: ${colors.white};
-          text-decoration: none;
-          font-size: 16px;
-          font-weight: 600;
-          padding: 10px 18px;
-          border-radius: 12px;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          white-space: nowrap;
-          position: relative;
-          font-family: 'Inter', sans-serif;
-          background: transparent;
-        }
-
-        .nav-link::after {
-          content: '';
-          position: absolute;
-          bottom: 0;
-          left: 50%;
-          width: 0%;
-          height: 2px;
-          background: linear-gradient(90deg, ${colors.primary}, ${colors.accent});
-          border-radius: 2px;
-          transform: translateX(-50%);
-          transition: width 0.3s ease;
-        }
-
-        .nav-link:hover {
-          color: ${colors.primary};
-          transform: translateY(-3px) scale(1.05);
-          background: linear-gradient(135deg, ${colors.primary}15, ${colors.secondary}10);
-        }
-
-        .nav-link:hover::after {
-          width: 80%;
-        }
-
-        .cta-button {
-          background: linear-gradient(135deg, ${colors.primary}, ${colors.secondary});
-          color: ${colors.white};
-          border: none;
-          padding: 14px 32px;
-          border-radius: 50px;
-          font-size: 15px;
-          font-weight: 700;
-          cursor: pointer;
-          white-space: nowrap;
-          box-shadow: 0 6px 20px ${colors.primary}40;
-          font-family: 'Inter', sans-serif;
-          position: relative;
-          overflow: hidden;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          letter-spacing: 0.3px;
-        }
-
-        .cta-button:hover {
-          transform: translateY(-3px) scale(1.05);
-          box-shadow: 0 12px 30px ${colors.primary}60;
-        }
-
-        .button-glow {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          width: 100%;
-          height: 100%;
-          background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
-          transform: translate(-50%, -50%) scale(0);
-          opacity: 0;
-          transition: all 0.6s ease;
-        }
-
-        .cta-button:hover .button-glow {
-          transform: translate(-50%, -50%) scale(1.5);
-          opacity: 0;
-        }
-
-        /* Mobile Menu Button */
-        .mobile-menu-button {
-          display: none;
-          background: rgba(255,255,255,0.1);
-          border: none;
-          padding: 12px;
-          border-radius: 10px;
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
-
-        .mobile-menu-button:hover {
-          background: rgba(255,255,255,0.15);
-        }
-
-        .hamburger {
-          width: 24px;
-          height: 20px;
-          position: relative;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-        }
-
-        .hamburger span {
-          display: block;
-          width: 100%;
-          height: 2px;
-          background: ${colors.white};
-          border-radius: 2px;
-          transition: all 0.3s ease;
-        }
-
-        .hamburger.active span:nth-child(1) {
-          transform: translateY(9px) rotate(45deg);
-        }
-
-        .hamburger.active span:nth-child(2) {
-          opacity: 0;
-        }
-
-        .hamburger.active span:nth-child(3) {
-          transform: translateY(-9px) rotate(-45deg);
-        }
-
-        /* Mobile Navigation */
-        .mobile-nav {
-          max-height: 0;
-          overflow: hidden;
-          background: linear-gradient(135deg, ${colors.dark}, ${colors.darkBlue});
-          backdrop-filter: blur(30px);
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-          border-bottom: 1px solid ${colors.primary}30;
-          transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .mobile-nav.active {
-          max-height: 500px;
-        }
-
-        .mobile-nav-content {
-          padding: 20px;
-          display: flex;
-          flex-direction: column;
-        }
-
-        .mobile-nav-link {
-          color: ${colors.white};
-          text-decoration: none;
-          font-size: 18px;
-          font-weight: 600;
-          padding: 20px 0;
-          border-bottom: 1px solid ${colors.primary}20;
-          transition: all 0.3s ease;
-          font-family: 'Inter', sans-serif;
-          display: flex;
-          align-items: center;
-          gap: 15px;
-        }
-
-        .mobile-nav-link:hover {
-          color: ${colors.primary};
-          padding-left: 15px;
-        }
-
-        .mobile-nav-dot {
-          width: 6px;
-          height: 6px;
-          border-radius: 50%;
-          background: ${colors.primary};
-          opacity: 0.5;
-          transition: opacity 0.3s ease;
-        }
-
-        .mobile-nav-link:hover .mobile-nav-dot {
-          opacity: 1;
-        }
-
-        .mobile-cta-button {
-          background: linear-gradient(135deg, ${colors.primary}, ${colors.secondary});
-          color: ${colors.white};
-          border: none;
-          padding: 18px 32px;
-          border-radius: 50px;
-          font-size: 16px;
-          font-weight: 700;
-          cursor: pointer;
-          margin-top: 25px;
-          transition: all 0.3s ease;
-          font-family: 'Inter', sans-serif;
-          box-shadow: 0 6px 20px ${colors.primary}40;
-        }
-
-        .mobile-cta-button:hover {
-          transform: scale(1.05);
-          box-shadow: 0 10px 25px ${colors.primary}60;
-        }
-
-        /* Responsive Styles */
-        @media (max-width: 1024px) {
-          .header-content {
-            padding: 0 30px;
-          }
-
-          .desktop-nav {
-            gap: 20px;
-          }
-
-          .nav-link {
-            font-size: 15px;
-            padding: 8px 14px;
-          }
-
-          .cta-button {
-            padding: 12px 24px;
-            font-size: 14px;
-          }
-        }
 
         @media (max-width: 768px) {
-          .header-content {
-            padding: 0 20px;
-            height: 70px;
-          }
-
           .desktop-nav {
-            display: none;
+            display: none !important;
           }
 
           .mobile-menu-button {
-            display: block;
-          }
-
-          .logo-text {
-            font-size: 24px;
-          }
-
-          .logo-image-wrapper {
-            width: 40px;
-            height: 40px;
+            display: block !important;
           }
         }
 
-        @media (max-width: 480px) {
-          .header-content {
-            padding: 0 16px;
-            height: 65px;
+        @media (min-width: 769px) {
+          .mobile-nav {
+            display: none !important;
           }
-
-          .logo-text {
-            font-size: 20px;
-          }
-
-          .logo-image-wrapper {
-            width: 36px;
-            height: 36px;
-          }
-
-          .mobile-nav-link {
-            font-size: 16px;
-            padding: 16px 0;
-          }
-        }
-
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar {
-          width: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-          background: ${colors.dark};
-        }
-
-        ::-webkit-scrollbar-thumb {
-          background: linear-gradient(135deg, ${colors.primary}, ${colors.secondary});
-          border-radius: 5px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-          background: linear-gradient(135deg, ${colors.primaryLight}, ${colors.accent});
         }
       `}</style>
     </>
