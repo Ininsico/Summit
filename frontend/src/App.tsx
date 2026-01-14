@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useEffect } from 'react';
 import LandingPage from "./Pages/LandingPage/LandingPage";
 import AboutPage from './Pages/AboutPage/AboutPage';
+import DestinationsPage from './Pages/DestinationsPage/DestinationsPage';
+import VehiclesPage from './Pages/VehiclesPage/VehiclesPage';
 import { useAppStore } from './store/useAppStore';
 import { shouldReduceAnimations } from './utils/performanceUtils';
 import { initGSAPDefaults } from './utils/gsapUtils';
@@ -54,7 +56,9 @@ const App = () => {
       <div style={{ backgroundColor: '#0a0e27', minHeight: '100vh' }}>
         <Routes>
           <Route path='/' element={<LandingPage />}></Route>
-          <Route path='/About' element={<AboutPage />}></Route>
+          <Route path='/about' element={<AboutPage />}></Route>
+          <Route path='/destinations' element={<DestinationsPage />}></Route>
+          <Route path='/vehicles' element={<VehiclesPage />}></Route>
         </Routes>
       </div>
     </Router>

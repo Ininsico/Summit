@@ -17,9 +17,8 @@ const Header = () => {
   // Navigation items with proper routing
   const navItems = [
     { label: 'Home', path: '/' },
-    { label: 'Destinations', path: '/#destinations' },
-    { label: 'Trips', path: '/#trips' },
-    { label: 'Hotels', path: '/#hotels' },
+    { label: 'Destinations', path: '/destinations' },
+    { label: 'Vehicles', path: '/vehicles' },
     { label: 'About', path: '/about' },
   ];
 
