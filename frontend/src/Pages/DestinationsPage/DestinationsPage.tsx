@@ -394,7 +394,7 @@ const DestinationsPage = () => {
                                             flexWrap: 'wrap',
                                             gap: '8px'
                                         }}>
-                                            {destination.highlights.slice(0, 3).map((highlight, i) => (
+                                            {destination.highlights.slice(0, 3).map((highlight: string, i: number) => (
                                                 <span
                                                     key={i}
                                                     style={{
